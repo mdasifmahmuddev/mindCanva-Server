@@ -29,12 +29,18 @@ async function run() {
     const favoritesCollection = database.collection('favorites');
     const likesCollection = database.collection('likes');
 
-    app.post('/users', async (req, res) => {
-      try {
-        const newUser = req.body;
-        const email = req.body.email;
-        const query = { email: email };
-        const existingUser = await userCollection.findOne(query);
+   app.post('/users', async (req, res) => {
+  try {
+    const newUser = req.body;
+    const email = req.body.email;
+    
+     
+    if (!email || !email.includes('@')) {
+      return res.status(400).send({ error: 'Invalid email format' });
+    }
+    
+    const query = { email: email };
+    const existingUser = await userCollection.findOne(query);
 
         if (existingUser) {
           return res.send({ message: 'user already exists', insertedId: null });
