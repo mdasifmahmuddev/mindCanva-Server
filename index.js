@@ -88,15 +88,26 @@ async function run() {
       }
     });
 
-    app.get('/artworks', async (req, res) => {
-      try {
-        const result = await artworks.find({ visibility: 'Public' }).toArray();
-        res.send(result);
-      } catch (error) {
-        console.error(error);
-        res.status(500).send({ error: 'Failed to fetch artworks' });
-      }
-    });
+
+
+   app.get('/artworks', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 100;  
+    const result = await artworks
+      .find({ visibility: 'Public' })
+      .limit(limit)  
+      .toArray();
+    res.send(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: 'Failed to fetch artworks' });
+  }
+});
+
+
+
+
+
 
     app.get('/artworks/latest', async (req, res) => {
       try {
