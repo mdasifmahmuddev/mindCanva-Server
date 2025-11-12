@@ -91,11 +91,6 @@ async function run() {
   }
 });
 
-
-
-
-
-
    app.get('/artworks', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 100;  
@@ -109,11 +104,6 @@ async function run() {
     res.status(500).send({ error: 'Failed to fetch artworks' });
   }
 });
-
-
-
-
-
 
     app.get('/artworks/latest', async (req, res) => {
       try {
@@ -250,6 +240,11 @@ async function run() {
         const { id } = req.params;
         const { user_email } = req.body;
 
+        const artwork = await artworks.findOne({ _id: new ObjectId(id) });
+        if (!artwork) {
+          return res.status(404).send({ error: 'Artwork not found' });
+        }
+
         const existingLike = await likesCollection.findOne({
           artwork_id: id,
           user_email: user_email
@@ -325,7 +320,10 @@ async function run() {
       try {
         const email = req.query.email;
         const result = await favoritesCollection.find({ user_email: email }).toArray();
-        res.send(result);
+        res.send({
+          favorites: result,
+          total: result.length
+        });
       } catch (error) {
         console.error(error);
         res.status(500).send({ error: 'Failed to fetch favorites' });
@@ -362,22 +360,19 @@ async function run() {
       }
     });
 
-
-
-
-
  app.get('/search', async (req, res) => {
   try {
     const searchText = req.query.search;
     const category = req.query.category;   
 
-    const query = {
-      $or: [
+    const query = { visibility: 'Public' };
+
+    if (searchText) {
+      query.$or = [
         { title: { $regex: searchText, $options: 'i' } },
         { artist_name: { $regex: searchText, $options: 'i' } }
-      ],
-      visibility: 'Public'
-    };
+      ];
+    }
 
     if (category) {   
       query.category = category;
@@ -390,12 +385,6 @@ async function run() {
     res.status(500).send({ error: 'Failed to search artworks' });
   }
 });
-
-
-
-
-
-
 
     app.get('/artists/top', async (req, res) => {
       try {
