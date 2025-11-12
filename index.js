@@ -177,6 +177,7 @@ async function run() {
     app.post('/artworks', async (req, res) => {
       try {
         const data = req.body;
+         data.created_at = new Date();
         const result = await artworks.insertOne(data);
         res.send({
           success: true,
