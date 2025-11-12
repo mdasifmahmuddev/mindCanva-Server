@@ -54,39 +54,45 @@ async function run() {
       }
     });
 
-    app.put('/users/profile', async (req, res) => {
-      try {
-        const { email, displayName, photoURL } = req.body;
-        const filter = { email: email };
-        const update = {
-          $set: {
-            displayName: displayName,
-            photoURL: photoURL,
-            updatedAt: new Date()
-          }
-        };
-        const options = { upsert: true };
-        const result = await userCollection.updateOne(filter, update, options);
-
-        await artworks.updateMany(
-          { created_by: email },
-          {
-            $set: {
-              artist_name: displayName,
-              artist_photo: photoURL
-            }
-          }
-        );
-
-        res.send({
-          success: true,
-          result
-        });
-      } catch (error) {
-        console.error(error);
-        res.status(500).send({ error: 'Failed to update profile' });
+  app.put('/users/profile', async (req, res) => {
+  try {
+    const { email, displayName, photoURL } = req.body;
+    const filter = { email: email };
+    const update = {
+      $set: {
+        displayName: displayName,
+        photoURL: photoURL,
+        updatedAt: new Date()
       }
+    };
+    const options = { upsert: true };
+    const result = await userCollection.updateOne(filter, update, options);
+
+    await artworks.updateMany(
+      { created_by: email },
+      {
+        $set: {
+          artist_name: displayName,
+          artist_photo: photoURL
+        }
+      }
+    );
+
+    const artworkCount = await artworks.countDocuments({ created_by: email });   
+
+    res.send({
+      success: true,
+      result,
+      artworkCount   
     });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: 'Failed to update profile' });
+  }
+});
+
+
+
 
 
 
