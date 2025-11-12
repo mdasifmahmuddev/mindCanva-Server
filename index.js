@@ -350,22 +350,40 @@ async function run() {
       }
     });
 
-    app.get('/search', async (req, res) => {
-      try {
-        const searchText = req.query.search;
-        const result = await artworks.find({
-          $or: [
-            { title: { $regex: searchText, $options: 'i' } },
-            { artist_name: { $regex: searchText, $options: 'i' } }
-          ],
-          visibility: 'Public'
-        }).toArray();
-        res.send(result);
-      } catch (error) {
-        console.error(error);
-        res.status(500).send({ error: 'Failed to search artworks' });
-      }
-    });
+
+
+
+
+ app.get('/search', async (req, res) => {
+  try {
+    const searchText = req.query.search;
+    const category = req.query.category;   
+
+    const query = {
+      $or: [
+        { title: { $regex: searchText, $options: 'i' } },
+        { artist_name: { $regex: searchText, $options: 'i' } }
+      ],
+      visibility: 'Public'
+    };
+
+    if (category) {   
+      query.category = category;
+    }
+
+    const result = await artworks.find(query).toArray();
+    res.send(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: 'Failed to search artworks' });
+  }
+});
+
+
+
+
+
+
 
     app.get('/artists/top', async (req, res) => {
       try {
