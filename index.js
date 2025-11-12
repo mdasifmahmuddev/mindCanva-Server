@@ -160,15 +160,21 @@ async function run() {
     });
 
     app.get('/my-artworks', async (req, res) => {
-      try {
-        const email = req.query.email;
-        const result = await artworks.find({ created_by: email }).toArray();
-        res.send(result);
-      } catch (error) {
-        console.error(error);
-        res.status(500).send({ error: 'Failed to fetch user artworks' });
-      }
-    });
+  try {
+    const email = req.query.email;
+    const sortBy = req.query.sort || 'created_at';   
+    const sortOrder = req.query.order === 'asc' ? 1 : -1;   
+    
+    const result = await artworks
+      .find({ created_by: email })
+      .sort({ [sortBy]: sortOrder })   
+      .toArray();
+    res.send(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: 'Failed to fetch user artworks' });
+  }
+});
 
     app.get('/artworks/artist/:email', async (req, res) => {
       try {
