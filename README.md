@@ -2,7 +2,7 @@
 
 Backend API for mindCanva - handles all the database , user data, and artwork management.
 
-**Live API:** ``
+**Live API:** [mindCanva Server](https://mind-canvas-server-dun.vercel.app)
 
 ---
 
